@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real Estate Database</title>
+</head>
+<body>
+    <h1>Real Estate Database</h1>
+    <form id="add-property-form">
+        <input type="text" name="id_mutation" placeholder="ID Mutation" required>
+        <input type="text" name="date_mutation" placeholder="Date Mutation" required>
+        <input type="text" name="nature_mutation" placeholder="Nature Mutation" required>
+        <input type="number" name="valeur_fonciere" placeholder="Valeur Fonciere" required>
+        <input type="number" name="adresse_numero" placeholder="Adresse Numero" required>
+        <input type="text" name="adresse_nom_voie" placeholder="Adresse Nom Voie" required>
+        <input type="number" name="code_postal" placeholder="Code Postal" required>
+        <input type="text" name="nom_commune" placeholder="Nom Commune" required>
+        <input type="number" name="code_departement" placeholder="Code Departement" required>
+        <input type="text" name="id_parcelle" placeholder="ID Parcelle" required>
+        <button type="submit">Add Property</button>
+    </form>
+    <ul id="properties-list"></ul>
+    <script>
+        document.getElementById('add-property-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            fetch('/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(response => response.json()).then(data => {
+                console.log(data);
+                if (data.status === "Property added") {
+                    alert("Property added successfully");
+                } else {
+                    alert("Error adding property");
+                }
+            }).catch(error => {
+                console.error("Error:", error);
+                alert("Error adding property");
+            });
+        });
+
+        fetch('/properties')
+            .then(response => response.json())
+            .then(properties => {
+                const propertiesList = document.getElementById('properties-list');
+                properties.forEach(property => {
+                    const li = document.createElement('li');
+                    li.textContent = `${property.adresse_nom_voie} in ${property.nom_commune} priced at ${property.valeur_fonciere}`;
+                    propertiesList.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching properties:', error);
+            });
+    </script>
+</body>
+</html>
